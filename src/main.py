@@ -1,5 +1,5 @@
-from utils.asistent import Asistent
+from asistente.assistant import  Assistant
 
 if __name__ == '__main__':
-    asistente = Asistent()
+    asistente = Assistant()
     asistente.run()
