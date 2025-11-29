@@ -1,7 +1,7 @@
 from .voice_engine import VoiceEngine
 from .speech_recognizer import SpeechRecognizer
-from .word_game import WordGame
-from .repeater_mode import RepeaterMode
+from .modes.word_game_mode.word_game import WordGame
+from .modes.repeater_mode.repeater_mode import RepeaterMode
 
 class Assistant:
     def __init__(self):
@@ -16,7 +16,7 @@ class Assistant:
     def _setup_command_handlers(self):
         self.command_handlers = {
             'repetir': self.repeater_mode.activate,
-            'adivinar': self.word_game.start_game,
+            'adivinar': self.word_game.select_mode,
             'cerrar': self.close
         }
     

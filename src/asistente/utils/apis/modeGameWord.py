@@ -1,9 +1,9 @@
 import requests
 
-def get_daily_word():
+def modeGameWord(mode):
     """Obtener la palabra del día"""
     try:
-        url = "https://rae-api.com/api/daily"
+        url = f"https://rae-api.com/api/{mode}"
         headers = {"Accept": "application/json"}
 
         response = requests.get(url, headers=headers)

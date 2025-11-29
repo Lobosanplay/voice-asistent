@@ -1,15 +1,48 @@
-from .utils.apis.getDailyWord import get_daily_word
+from ...utils.apis.modeGameWord import modeGameWord
 
 class WordGame:
     def __init__(self, voice_engine, speech_recognizer):
         self.voice_engine = voice_engine
         self.speech_recognizer = speech_recognizer
         self.max_attempts = 5
+        self.is_active = True
+        
+        self._mode_handlers()
     
-    def start_game(self):
+    def _mode_handlers(self):
+        self.command_handlers = {
+            'random': self.start_game,
+            'daily': self.start_game,
+            'salir': self.exit
+        }
+    
+    def select_mode(self):
+        self.voice_engine.talk("Elige el modo del juego")
+        self.voice_engine.talk("Modos: random, daily y salir")
+        
+        while self.is_active:
+            command = self.speech_recognizer.listen_from_microphone()
+            
+            if command:
+                self.handle_command(command)
+            else:
+                self.voice_engine.talk("El modo eleguido no ha sido encontrado")
+    
+    def exit(self, command):
+        self.voice_engine.talk("saliendo del modo adivinar")
+        self.is_active = False
+        
+    def handle_command(self, command):
+        handler = self.command_handlers.get(command)
+        if handler:
+            handler(command)
+        else:
+            self.voice_engine.talk("Comando no reconocido")
+    
+    def start_game(self, mode):
         try:
-            self.voice_engine.talk("Modo adivinanza activado. Adivina la palabra.")
-            result = get_daily_word()
+            self.voice_engine.talk("Modo adivinanza activado. Cargando la palabra.")
+            result = modeGameWord(mode)
             self.word = result['data']['word']
             self.attempts = 0
 
