@@ -2,6 +2,13 @@ from .voice_engine import VoiceEngine
 from .speech_recognizer import SpeechRecognizer
 from .modes.word_game_mode.word_game import WordGame
 from .modes.repeater_mode.repeater_mode import RepeaterMode
+from dotenv import load_dotenv
+import re 
+import shutil
+import os
+
+
+load_dotenv()
 
 class Assistant:
     def __init__(self):
@@ -20,6 +27,30 @@ class Assistant:
             'cerrar': self.close
         }
     
+    def open_file(self, name):
+        self.voice_engine.talk(f'Buscando el arhivo {name}')
+        for key, value in os.environ.items():
+            if name.upper() == key:
+                self.voice_engine.talk(f'Abriendo {name}')
+                os.startfile(value)
+                return 
+                 
+            if name == 'all':
+                for key, value in os.environ.items():
+                    self.voice_engine.talk('Abriendo Todos las aplicaciones')
+                    os.startfile(value)
+                    return
+    
+        file_path = shutil.which(name)
+
+        if file_path:
+            print(file_path)
+            self.voice_engine.talk(f'Abriendo {name}')
+            os.startfile(file_path)
+            return
+        else: 
+            self.voice_engine.talk('No se encontro la ruta del archivo')
+    
     def handle_command(self, command):
         handler = self.command_handlers.get(command)
         if handler:
@@ -33,11 +64,18 @@ class Assistant:
     
     def run(self):
         self.voice_engine.talk("Asistente activado. Elige funcionalidad.")
-        self.voice_engine.talk("Opciones: repetir, adivinar o cerrar")
+        self.voice_engine.talk("Opciones: repetir, adivinar, abrir aplicaciion o cerrar")
         
         while self.is_running:
             command = self.speech_recognizer.listen_from_microphone()
-            if command:
-                self.handle_command(command)
-            else:
-                self.voice_engine.talk("No entendí el comando. Las opciones son: repetir, adivinar o cerrar")
+            
+            try:
+                if not command.startswith('open'):
+                    self.handle_command(command)
+                elif command.startswith('open') or command.startswith('Open'):
+                    file_name = re.sub("open ", "", command.lower())
+                    self.open_file(file_name)
+                else:
+                    self.voice_engine.talk("No entendí el comando. Las opciones son: repetir, adivinar o cerrar")
+            except Exception as e:
+                self.voice_engine.talk('Porfavor diga algo')
