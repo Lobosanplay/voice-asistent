@@ -2,6 +2,7 @@ from .voice_engine import VoiceEngine
 from .speech_recognizer import SpeechRecognizer
 from .modes.word_game_mode.word_game import WordGame
 from .modes.repeater_mode.repeater_mode import RepeaterMode
+from .modes.writing_voice.writing_voice import WritingVoice
 from dotenv import load_dotenv
 import re 
 import shutil
@@ -16,6 +17,7 @@ class Assistant:
         self.speech_recognizer = SpeechRecognizer()
         self.word_game = WordGame(self.voice_engine, self.speech_recognizer)
         self.repeater_mode = RepeaterMode(self.voice_engine, self.speech_recognizer)
+        self.writing_voice = WritingVoice(self.voice_engine, self.speech_recognizer)
         self.is_running = True
         
         self._setup_command_handlers()
@@ -24,6 +26,7 @@ class Assistant:
         self.command_handlers = {
             'repetir': self.repeater_mode.activate,
             'adivinar': self.word_game.select_mode,
+            'escribir': self.writing_voice.select_name,
             'cerrar': self.close
         }
     
@@ -64,7 +67,7 @@ class Assistant:
     
     def run(self):
         self.voice_engine.talk("Asistente activado. Elige funcionalidad.")
-        self.voice_engine.talk("Opciones: repetir, adivinar, abrir aplicaciion o cerrar")
+        self.voice_engine.talk("Opciones: repetir, adivinar, escribir, abrir aplicaciion o cerrar")
         
         while self.is_running:
             command = self.speech_recognizer.listen_from_microphone()
